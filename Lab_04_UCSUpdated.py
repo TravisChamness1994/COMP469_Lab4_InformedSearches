@@ -1,9 +1,19 @@
-# -*- coding: utf-8 -*-
 """
 Created on Sun Sep 19 12:15:01 2021
 Updated 09/19/21 4:02 pm
 @author: Daniel & Smooch Master 420 BLAYZE Dingo
 """
+import sys
+
+ROW_BOUND = 
+maze = []
+startNode = None
+goalNode = None
+fringe = []
+visited = []
+ULDR  = None#funfun
+currentNode = None
+
 ROBOT = 'R'
 DIAMOND = 'D'
 
@@ -64,8 +74,6 @@ def initialization():
     #         ["-",1,1,1,1,1,"-"],
     #         ["-",1,3,3,3,1,"-"],
     #         ["-","-","-","-","-","-","-"]]
-    startNode =  None
-    goalNode = None
     find_goal_start = True
     startNode, goalNode = print_maze_id_start_goal(find_goal_start)
     fringe = [startNode]
@@ -89,10 +97,10 @@ def print_maze_id_start_goal(find_goal_start = False):
     else:
         return ""  # effectively return nothing
 
-def lowestCostNode():
+def lowestCostNode(currentNode):
     '''This will pick the lowest cost node from the fringe '''
-    maxCost = 100000
-    smallestCostNode = node(cost = maxCost)
+    maxCost = sys.maxsize #acts as the largest possible integer
+    smallestCostNode = node(None, None,maxCost, None)
     for element in fringe:
         if element.cost < smallestCostNode.cost and element not in visited: #change not in visited with travis node function, will have to make function go through all nodes in visited to see their data
             smallestCostNode = element
@@ -100,6 +108,7 @@ def lowestCostNode():
     if(smallestCostNode.cost == maxCost):
         print("All nodes left have been visited")
         ## what should the algorithm do if nodes in fringe have already been visited
+        return currentNode
     else:
         return smallestCostNode
    
@@ -111,12 +120,12 @@ def goalTest(sampleNode):
     
 def successor_function():
     #this will go inside the while loop in main()
-    
-    currentNode = lowestCostNode() #from fringe
+    global currentNode
+    currentNode = lowestCostNode(currentNode) #from fringe
     for moves in ULDR:
-        child = node()
-        child.parent = currentNode
-        child.data = [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]]
+        child = node(currentNode, [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]], None, None)
+        # child.parent = currentNode
+        # child.data = [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]]
         child.cost = currentNode.cost + maze[child.data[0]][child.data[1]] #might have to check that we are not interacting with walls
         
         if (child.cost.isnumeric()) and (child.data[0] < len(maze) and child.data[1] < len(maze[0])):
@@ -127,13 +136,14 @@ def successor_function():
     visited.append(currentNode)
             
 def main():
+    global currentNode
     initialization()
     while fringe:
+        currentNode = fringe.pop()
         if not goalTest(currentNode): #reduced goalTest(currentNode) == False to logical equiv with not statement
             successor_function()
         else:
             #needs to execute commands that will RETURN plan cost and nodes to get there
-            
             pass
     
     print("No solution found")
