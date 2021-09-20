@@ -5,7 +5,6 @@ Updated 09/19/21 4:02 pm
 """
 import sys
 
-ROW_BOUND = 
 maze = []
 startNode = None
 goalNode = None
@@ -22,7 +21,7 @@ class node:
         self.parent = parent
         self.data = data
         self.cost = cost
-        self.children = children
+        self.children = []
 
 #Stolen from Lab 3
 def create_map():
@@ -99,17 +98,21 @@ def print_maze_id_start_goal(find_goal_start = False):
 
 def lowestCostNode(currentNode):
     '''This will pick the lowest cost node from the fringe '''
+    global fringe
+    nodeIndex = None
     maxCost = sys.maxsize #acts as the largest possible integer
     smallestCostNode = node(None, None,maxCost, None)
-    for element in fringe:
+    for index,element in enumerate(fringe):
         if element.cost < smallestCostNode.cost and element not in visited: #change not in visited with travis node function, will have to make function go through all nodes in visited to see their data
             smallestCostNode = element
+            nodeIndex = index
     
     if(smallestCostNode.cost == maxCost):
         print("All nodes left have been visited")
         ## what should the algorithm do if nodes in fringe have already been visited
         return currentNode
     else:
+        fringe.pop(nodeIndex)
         return smallestCostNode
    
 def goalTest(sampleNode):
@@ -121,25 +124,34 @@ def goalTest(sampleNode):
 def successor_function():
     #this will go inside the while loop in main()
     global currentNode
-    currentNode = lowestCostNode(currentNode) #from fringe
+    global fringe
+    global ULDR
+    global visited
+
+    # currentNode = lowestCostNode(currentNode) #from fringe
     for moves in ULDR:
-        child = node(currentNode, [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]], None, None)
-        # child.parent = currentNode
-        # child.data = [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]]
-        child.cost = currentNode.cost + maze[child.data[0]][child.data[1]] #might have to check that we are not interacting with walls
-        
-        if (child.cost.isnumeric()) and (child.data[0] < len(maze) and child.data[1] < len(maze[0])):
+        #If the move doesn't result in being on a wall
+        if maze[currentNode.data[0]+moves[0]][currentNode.data[1] + moves[1]] != '-':
+            child = node(currentNode, [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]], None, None)
+            # Robot and Diamond both account for 0 cost, but must be handled respecitively as 0 cost
+            if maze[child.data[0]][child.data[1]] != 'R' and maze[child.data[0]][child.data[1]] != 'D':
+                child.cost = currentNode.cost + maze[child.data[0]][child.data[1]]
+            else:
+                #Els the most is Diamond or Robot and incur 0 cost to child
+                child.cost = currentNode.cost
             currentNode.children.append(child)
-            fringe.append(child) #fringe nodes do not have children, while visited nodes do
-            
+            fringe.append(child)
     #after finding all children of currentNode, place it in visited
     visited.append(currentNode)
             
 def main():
     global currentNode
+    global fringe
+    global currentNode
+
     initialization()
     while fringe:
-        currentNode = fringe.pop()
+        currentNode = lowestCostNode(currentNode)
         if not goalTest(currentNode): #reduced goalTest(currentNode) == False to logical equiv with not statement
             successor_function()
         else:
@@ -150,9 +162,10 @@ def main():
 
 main()
 
-
+# YO DANIEL
 # For Priority Queue Testing: "TypeError: '<' not supported between instances of 'node' and 'node'"
 # On briefly checking, there is no means to override < for our needs.
+
 # fancyList = []
 # node1 = node(None, [1,1], 1, None)
 # node2 = node(None, [2,2], 2, None)
