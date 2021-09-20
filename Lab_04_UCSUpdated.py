@@ -2,7 +2,7 @@
 """
 Created on Sun Sep 19 12:15:01 2021
 Updated 09/19/21 4:02 pm
-@author: Daniel
+@author: Daniel & Smooch Master 420 BLAYZE Dingo
 """
 ROBOT = 'R'
 DIAMOND = 'D'
