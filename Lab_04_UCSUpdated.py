@@ -10,6 +10,8 @@ startNode = None
 goalNode = None
 fringe = []
 visited = []
+path = []
+pathCost = None
 ULDR  = None#funfun
 currentNode = None
 
@@ -27,6 +29,7 @@ class node:
 def create_map():
     # map_name = input("Enter map name(try \"mazeMap.txt\"): ")
     map_name = "labGivenMaze.txt"
+    # map_name = "maze1.txt"
     file = open(map_name, "r")
 
     maze = []
@@ -116,8 +119,10 @@ def lowestCostNode(currentNode):
         fringe.pop(nodeIndex)
         return smallestCostNode
    
-def goalTest(sampleNode):
-    if sampleNode.data == goalNode.data:
+def goalTest():
+    global goalNode
+    global currentNode
+    if currentNode.data == goalNode.data:
         return True
     else:
         return False
@@ -138,29 +143,54 @@ def successor_function():
             if maze[child.data[0]][child.data[1]] != 'R' and maze[child.data[0]][child.data[1]] != 'D':
                 child.cost = currentNode.cost + maze[child.data[0]][child.data[1]]
             else:
-                #Els the most is Diamond or Robot and incur 0 cost to child
+                #Else the most is Diamond or Robot and incur 0 cost to child
                 child.cost = currentNode.cost
             currentNode.children.append(child)
             fringe.append(child)
     #after finding all children of currentNode, place it in visited
     visited.append(currentNode)
-            
+
+def in_visited():
+    global visited
+    global currentNode
+
+    in_visited = False
+    for node in visited:
+        if currentNode.data == node.data:
+            in_visited = True
+        if in_visited:
+            break
+    return in_visited
+
+def populate_path():
+    global currentNode
+    global pathCost
+    global path
+
+    pathCost = currentNode.cost
+    while currentNode != None:
+        path.insert(0,currentNode.data)
+        currentNode = currentNode.parent
+
 def main():
     global currentNode
     global fringe
     global currentNode
-
+    global path
+    goalFound = False
     initialization()
     while fringe:
         currentNode = lowestCostNode(currentNode)
-        if not goalTest(currentNode): #reduced goalTest(currentNode) == False to logical equiv with not statement
+        goalFound = goalTest()
+        if not goalFound and not in_visited(): #reduced goalTest(currentNode) == False to logical equiv with not statement
             successor_function()
-        else:
-            #needs to execute commands that will RETURN plan cost and nodes to get there
-            pass
-    
-    print("No solution found")
-
+        elif goalFound:
+            print("It be found")
+            populate_path()
+            break
+    print(path)
+    print(pathCost)
+    return path, pathCost
 main()
 
 # YO DANIEL
