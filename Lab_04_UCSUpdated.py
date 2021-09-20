@@ -99,6 +99,7 @@ def print_maze_id_start_goal(find_goal_start = False):
 def lowestCostNode(currentNode):
     '''This will pick the lowest cost node from the fringe '''
     global fringe
+
     nodeIndex = None
     maxCost = sys.maxsize #acts as the largest possible integer
     smallestCostNode = node(None, None,maxCost, None)
