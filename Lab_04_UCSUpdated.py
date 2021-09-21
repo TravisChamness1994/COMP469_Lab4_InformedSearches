@@ -1,7 +1,7 @@
 """
 Created on Sun Sep 19 12:15:01 2021
 Updated 09/19/21 4:02 pm
-@author: Daniel & Smooch Master 420 BLAYZE Dingo
+@author: Daniel Ramirez & Travis Chamness
 """
 import sys
 
@@ -69,13 +69,6 @@ def initialization():
     global currentNode
 
     maze = create_map() #Builds maps for us via txt file
-    #
-    # maze1 = [
-    #         ["-","-","-","-","-","-","-"],
-    #         ["-","R",6,6,6,"D","-"],
-    #         ["-",1,1,1,1,1,"-"],
-    #         ["-",1,3,3,3,1,"-"],
-    #         ["-","-","-","-","-","-","-"]]
     find_goal_start = True
     startNode, goalNode = print_maze_id_start_goal(find_goal_start)
     fringe = [startNode]
@@ -185,26 +178,11 @@ def main():
         if not goalFound and not in_visited(): #reduced goalTest(currentNode) == False to logical equiv with not statement
             successor_function()
         elif goalFound:
-            print("It be found")
             populate_path()
             break
     print(path)
     print(pathCost)
     return path, pathCost
+
 main()
 
-# YO DANIEL
-# For Priority Queue Testing: "TypeError: '<' not supported between instances of 'node' and 'node'"
-# On briefly checking, there is no means to override < for our needs.
-
-# fancyList = []
-# node1 = node(None, [1,1], 1, None)
-# node2 = node(None, [2,2], 2, None)
-# node3 = node(None, [3,3], 1, None)
-# node4 = node(None, [4,4], 2, None)
-# fancyList.append((node1.cost, node1))
-# fancyList.append((node2.cost, node2))
-# fancyList.append((node3.cost, node3))
-# fancyList.append((node4.cost, node4))
-# fancyList.sort(reverse=True)
-# print(fancyList.pop())
