@@ -20,11 +20,11 @@ DIAMOND = 'D'
 
 class node:
     def __init__(self,parent,data,cost,children, forwardCost):
-        self.parent = parent
-        self.data = data
-        self.cost = cost
-        self.forwardCost = forwardCost
-        self.children = []
+        self.parent = parent # Points to the parent node in the state chart
+        self.data = data # Represents the [Row][Col] position of the node
+        self.cost = cost # The cost as determined by the cumulative cost of the path taken to this tile on the maze
+        self.forwardCost = forwardCost # The cost determined by the heuristic function
+        self.children = [] # The children states of this  node
 
 #Stolen from Lab 3
 def create_map():
@@ -72,6 +72,7 @@ def initialization():
     maze = create_map() #Builds maps for us via txt file
     find_goal_start = True
     startNode, goalNode = print_maze_id_start_goal(find_goal_start)
+    # Grab the future cost for the start node
     startNode = heuristic_function(startNode)
     fringe = [startNode]
     visited = []
@@ -94,6 +95,7 @@ def print_maze_id_start_goal(find_goal_start = False):
     else:
         return ""  # effectively return nothing
 
+
 def lowestCostNode(currentNode):
     '''This will pick the lowest cost node from the fringe '''
     global fringe
@@ -102,13 +104,13 @@ def lowestCostNode(currentNode):
     maxCost = sys.maxsize #acts as the largest possible integer
     smallestCostNode = node(None, None,None, None, maxCost)
     for index,element in enumerate(fringe):
-        if element.forwardCost < smallestCostNode.forwardCost: #change not in visited with travis node function, will have to make function go through all nodes in visited to see their data
+        # Lowest cost node now needs to find the Lowest 'Future Cost' node, and has been updated to do so.
+        if element.forwardCost < smallestCostNode.forwardCost:
             smallestCostNode = element
             nodeIndex = index
 
     if(smallestCostNode.forwardCost == maxCost):
         print("All nodes left have been visited")
-        ## what should the algorithm do if nodes in fringe have already been visited
         return currentNode
     else:
         fringe.pop(nodeIndex)
@@ -129,14 +131,14 @@ def successor_function():
     global ULDR
     global visited
 
-    # currentNode = lowestCostNode(currentNode) #from fringe
     for moves in ULDR:
         #If the move doesn't result in being on a wall
         if maze[currentNode.data[0]+moves[0]][currentNode.data[1] + moves[1]] != '-':
             child = node(currentNode, [currentNode.data[0]+moves[0],currentNode.data[1] + moves[1]], None, None, None)
-            # Robot and Diamond both account for 0 cost, but must be handled respecitively as 0 cost
+            #Heuristic function call added to child creation process
             child = heuristic_function(child)
-            if maze[child.data[0]][child.data[1]] != 'R' and maze[child.data[0]][child.data[1]] != 'D': #TODO Remove if-else statement
+            # Robot and Diamond both account for 0 cost, but must be handled respecitively as 0 cost
+            if maze[child.data[0]][child.data[1]] != 'R' and maze[child.data[0]][child.data[1]] != 'D':
                 child.cost = currentNode.cost + maze[child.data[0]][child.data[1]]
             else:
                 #Else the most is Diamond or Robot and incur 0 cost to child
@@ -146,6 +148,7 @@ def successor_function():
     #after finding all children of currentNode, place it in visited
     visited.append(currentNode)
 
+#No change from UCS implementation
 def in_visited():
     global visited
     global currentNode
@@ -158,6 +161,7 @@ def in_visited():
             break
     return in_visited
 
+# No Change from UCS implementation
 def populate_path():
     global currentNode
     global pathCost
@@ -168,6 +172,8 @@ def populate_path():
         path.insert(0,currentNode.data)
         currentNode = currentNode.parent
 
+# Heuristic Function:
+# Calculates manhattan distance from a node to the goal node.
 def heuristic_function(node):
     global goalNode
     node.forwardCost = abs(goalNode.data[0] - node.data[0]) + abs(goalNode.data[1] - node.data[1])
