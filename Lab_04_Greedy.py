@@ -5,17 +5,27 @@
 
 import sys
 
+#Stores the Maze
 maze = []
+#Holds starting position and will be first node on fringe
 startNode = None
+#Goal node holds goal position, only representative
 goalNode = None
+#Data structure that holds potential nodes for expansion
 fringe = []
+#Data structure that holds nodes which have already been visited
 visited = []
+#Upon reaching goal Path is populated with the path taken
 path = []
+#The cost of the path taken stored as an integer
 pathCost = None
-ULDR  = None#funfun
+#The pattern of movements: Up, Down, Left, then Right
+ULDR  = [[-1,0],[0,-1],[1,0],[0,1]]
+#The node currently being expanded
 currentNode = None
-
+#Literal R representing Robot in Initial Maze
 ROBOT = 'R'
+#Literal D representing Diamond in Initial Maze
 DIAMOND = 'D'
 
 class node:
@@ -65,9 +75,6 @@ def initialization():
     global startNode
     global goalNode
     global fringe
-    global visited
-    global ULDR #funfun
-    global currentNode
 
     maze = create_map() #Builds maps for us via txt file
     find_goal_start = True
@@ -75,9 +82,6 @@ def initialization():
     # Grab the future cost for the start node
     startNode = heuristic_function(startNode)
     fringe = [startNode]
-    visited = []
-    ULDR = [[-1,0],[0,-1],[1,0],[0,1]]  #recheck movement coordinates
-    currentNode = None
 
 # "Print maze and ID the Start and Goal"
 # Allows user to print a maze, and on request of a Boolean True find_goal_start parameter, return the start and goal nodes.
@@ -96,15 +100,15 @@ def print_maze_id_start_goal(find_goal_start = False):
         return ""  # effectively return nothing
 
 
-def lowestCostNode(currentNode):
+def lowestCostNode():
     '''This will pick the lowest cost node from the fringe '''
     global fringe
+    global currentNode
 
     nodeIndex = None
     maxCost = sys.maxsize #acts as the largest possible integer
-    smallestCostNode = node(None, None,None, None, maxCost)
+    smallestCostNode = node(None, None, None, None, maxCost)
     for index,element in enumerate(fringe):
-        # Lowest cost node now needs to find the Lowest 'Future Cost' node, and has been updated to do so.
         if element.forwardCost < smallestCostNode.forwardCost:
             smallestCostNode = element
             nodeIndex = index
@@ -187,7 +191,7 @@ def main():
     goalFound = False
     initialization()
     while fringe:
-        currentNode = lowestCostNode(currentNode)
+        currentNode = lowestCostNode()
         goalFound = goalTest()
         if not goalFound and not in_visited(): #reduced goalTest(currentNode) == False to logical equiv with not statement
             successor_function()
@@ -195,6 +199,6 @@ def main():
             populate_path()
             break
     print(path)
-    print(pathCost)
+    print("Cost of Plan:",pathCost)
     return path, pathCost
 main()

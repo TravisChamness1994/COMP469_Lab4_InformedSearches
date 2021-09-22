@@ -12,7 +12,7 @@ fringe = []
 visited = []
 path = []
 pathCost = None
-ULDR  = None#funfun
+ULDR  = [[-1,0],[0,-1],[1,0],[0,1]]
 currentNode = None
 
 ROBOT = 'R'
@@ -64,17 +64,11 @@ def initialization():
     global startNode
     global goalNode
     global fringe
-    global visited
-    global ULDR #funfun
-    global currentNode
 
     maze = create_map() #Builds maps for us via txt file
     find_goal_start = True
     startNode, goalNode = print_maze_id_start_goal(find_goal_start)
     fringe = [startNode]
-    visited = []
-    ULDR = [[-1,0],[0,-1],[1,0],[0,1]]  #recheck movement coordinates
-    currentNode = None
 
 # "Print maze and ID the Start and Goal"
 # Allows user to print a maze, and on request of a Boolean True find_goal_start parameter, return the start and goal nodes.
@@ -92,15 +86,16 @@ def print_maze_id_start_goal(find_goal_start = False):
     else:
         return ""  # effectively return nothing
 
-def lowestCostNode(currentNode):
+def lowestCostNode():
     '''This will pick the lowest cost node from the fringe '''
     global fringe
+    global currentNode
 
     nodeIndex = None
     maxCost = sys.maxsize #acts as the largest possible integer
     smallestCostNode = node(None, None,maxCost, None)
     for index,element in enumerate(fringe):
-        if element.cost < smallestCostNode.cost and element not in visited: #change not in visited with travis node function, will have to make function go through all nodes in visited to see their data
+        if element.cost < smallestCostNode.cost:
             smallestCostNode = element
             nodeIndex = index
     
@@ -173,15 +168,15 @@ def main():
     goalFound = False
     initialization()
     while fringe:
-        currentNode = lowestCostNode(currentNode)
+        currentNode = lowestCostNode()
         goalFound = goalTest()
-        if not goalFound and not in_visited(): #reduced goalTest(currentNode) == False to logical equiv with not statement
+        if not goalFound and not in_visited():
             successor_function()
         elif goalFound:
             populate_path()
             break
     print(path)
-    print(pathCost)
+    print("Cost of Plan:",pathCost)
     return path, pathCost
 
 main()
